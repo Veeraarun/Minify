@@ -22,7 +22,7 @@ def create_sample_image(format="JPEG", size=(600, 400), color=(180, 50, 100)) ->
 def create_sample_pdf() -> bytes:
     doc = pymupdf.open()
     page = doc.new_page()
-    page.insert_text((50, 72), "AI Compressor Test Document\nPreserving vector readability with fidelity.", fontsize=18)
+    page.insert_text((50, 72), "MINIFY Test Document\nPreserving vector readability with fidelity.", fontsize=18)
     
     # Insert an uncompressed sample raster image
     img_bytes = create_sample_image(format="PNG", size=(300, 300), color=(20, 150, 220))

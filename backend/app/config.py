@@ -38,4 +38,4 @@ for path in (UPLOAD_DIR, PROCESSED_DIR, PREVIEWS_DIR):
     path.mkdir(parents=True, exist_ok=True)
 
 # Retention policy (in seconds)
-FILE_RETENTION_SECONDS = 3600  # 1 hour
+FILE_RETENTION_SECONDS = int(os.getenv("FILE_RETENTION_SECONDS", "3600"))  # default 1 hour

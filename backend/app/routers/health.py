@@ -15,7 +15,7 @@ def get_health():
         status="healthy",
         service=PRODUCT_NAME,
         ffmpeg_available=ffmpeg_ok,
-        ffmpeg_version=get_ffmpeg_path() if ffmpeg_ok else None,
+        ffmpeg_version="available" if ffmpeg_ok else None,
         pillow_version=PIL.__version__,
         pymupdf_available=True,
         gemini_api_configured=is_gemini_available(),

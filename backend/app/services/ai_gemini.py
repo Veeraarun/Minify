@@ -95,7 +95,7 @@ async def answer_assistant_query_with_gemini(
 
     context_str = json.dumps(context) if context else "None"
     prompt = f"""
-You are the AI Compression Assistant inside 'AI Compressor'.
+You are the MINIFY Assistant inside 'MINIFY: Intelligent File Optimization'.
 You provide clear, friendly, and technically accurate advice on file compression, media codecs (WebP, AVIF, H.264, MP3), quality tradeoffs, and size targets.
 
 User Question: {question}

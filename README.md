@@ -251,6 +251,7 @@ npm run build   # Vite production build (0 errors)
 | `GEMINI_API_KEY` | `""` | Optional Google Gemini API key. If unset, MINIFY uses the deterministic local analyzer. |
 | `MAX_FILE_SIZE_MB` | `100` | Maximum upload limit per file in megabytes. |
 | `MAX_BATCH_FILES` | `25` | Maximum number of files in a single batch. |
+| `FILE_RETENTION_SECONDS` | `3600` | Automated file retention before purging (in seconds, default 1 hour). |
 | `HOST` | `0.0.0.0` | Server bind host. |
 | `PORT` | `8000` | Server bind port. |
 | `CORS_ORIGINS` | `http://localhost:5173,...` | Allowed CORS origins. |
