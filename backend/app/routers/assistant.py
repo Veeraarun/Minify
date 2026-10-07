@@ -9,20 +9,20 @@ def get_local_expert_answer(question: str, context: Dict[str, Any] = None) -> AI
     q = question.lower()
     
     # 1. Why low compression?
-    if "only compress" in q or "low compression" in q or "small reduction" in q or "20%" in q or "why" in q and "not smaller" in q:
+    if "only compress" in q or "low compression" in q or "small reduction" in q or "20%" in q or ("why" in q and "not smaller" in q):
         return AIAssistantResponse(
             answer="""### Why Files May Compress Less Than Expected
 
-1. **Already Compressed Media**: Modern JPGs, MP4s, WebP, and MP3s already use lossy compression with high entropy. Re-compressing already-optimized data yields diminishing returns.
-2. **Text / Vector PDFs**: If a PDF consists of raw text and vector paths rather than heavy raster scans, it's already compact.
-3. **Small Initial File Size**: Files below 100 KB have container header overhead (ID3 tags, MP4 atoms, PDF xref tables) that cannot be compressed further without corrupting the file structure.
+1. **Already Optimized Media**: Modern JPEGs, MP4s, WebP, and MP3s already utilize lossy entropy compression. Re-compressing already-optimized data yields diminishing returns.
+2. **Text & Vector PDFs**: If a PDF consists of raw vector paths and embedded font subsets rather than high-DPI raster scans, it is already compact.
+3. **Container Header Overhead**: Files below 100 KB have container header overhead (ID3 tags, MP4 atoms, PDF xref tables) that cannot be stripped without corrupting file structure.
 
-**Pro-Tip**: To achieve higher compression, consider lowering the target resolution (e.g. 1080p to 720p) or switching to modern container formats like **WebP** or **AVIF**.""",
+**Recommendation**: To achieve higher compression, consider selecting the **Web** or **Maximum Savings** preset, or enabling 75% resolution scaling.""",
             provider="Local Knowledge Engine",
             suggested_actions=[
-                "Switch target format to WebP",
+                "Switch to WebP format",
                 "Try 75% downscaling",
-                "Select 'Maximum Compression' preset"
+                "Select 'Maximum Savings' preset"
             ]
         )
 
@@ -31,11 +31,11 @@ def get_local_expert_answer(question: str, context: Dict[str, Any] = None) -> AI
         return AIAssistantResponse(
             answer="""### Recommended Formats by Media Type
 
-- **Photos & Web Graphics**: Use **WebP**. It is 25–35% smaller than JPEG at identical visual quality and natively supports transparency.
-- **Documents & Forms**: Keep as **PDF** with stream deflate. Only convert pages to images if strictly archiving scans.
-- **Videos for Web / Sharing**: Use **MP4 with H.264 (libx264)** for universal hardware playback across all browsers, mobile devices, and TVs.
-- **Speech Audio / Podcasts**: Use **MP3 at 64–96 kbps (mono)** or AAC at 64 kbps.
-- **Music Audio**: Use **MP3 at 128–192 kbps (stereo)** for transparent acoustic fidelity.""",
+- **Images & Photos**: Use **WebP**. It is typically 25–35% smaller than JPEG at identical visual quality and natively preserves alpha transparency.
+- **Documents & Forms**: Retain **PDF** with stream deflate. Text remains 100% crisp and selectable.
+- **Videos for Web / Sharing**: Use **MP4 with H.264 (libx264)** for universal hardware compatibility across all modern devices and browsers.
+- **Speech & Voice**: Use **MP3 at 64–96 kbps (mono)** or AAC at 64 kbps.
+- **Music & Hi-Fi**: Use **MP3 at 128–192 kbps (stereo)** for transparent acoustic fidelity.""",
             provider="Local Knowledge Engine",
             suggested_actions=[
                 "Convert images to WebP",
@@ -49,51 +49,51 @@ def get_local_expert_answer(question: str, context: Dict[str, Any] = None) -> AI
         return AIAssistantResponse(
             answer="""### Compressing to an Exact Target Size
 
-Yes! You can use the **Target Size** input in the Compression Engine step.
+Yes! You can specify an exact target size (e.g. 5 MB) under the **Target File Size** option.
 
-How our engine achieves your target:
-1. **Adaptive Bitrate / Quality Search**: The engine calculates the mathematical bit budget `(Target Bytes × 8) ÷ Duration` or runs iterative binary search on quantization matrices.
-2. **Graceful Quality Floor**: If the target cannot be reached without severe visual degradation (e.g. trying to squeeze a 4K 1-hour video into 2 MB), the engine stops at the safe minimum quality and warns you.
+How MINIFY achieves your target:
+1. **Adaptive Bitrate & Quantization Search**: MINIFY computes the exact bit budget `(Target Bytes × 8) ÷ Duration` or runs iterative binary search on quantization parameters.
+2. **Safe Quality Floor**: If the target cannot be safely reached without extreme visual degradation, MINIFY stops at the safe minimum quality and notifies you.
 
-**Recommendation**: Enter your target in the "Target File Size" field before clicking Compress.""",
+**Recommendation**: Enter your target in the target size input field before starting optimization.""",
             provider="Local Knowledge Engine",
             suggested_actions=[
-                "Enter Target Size (e.g. 5 MB)",
+                "Set Target Size (e.g. 5 MB)",
                 "Enable Resolution Scaling",
-                "Use Balanced Preset"
+                "Use Smart Optimize"
             ]
         )
 
     # 4. Will compression reduce quality?
     if "quality" in q or "degrade" in q or "loss" in q or "lossless" in q or "artifact" in q:
         return AIAssistantResponse(
-            answer="""### Will Compression Reduce Visual Quality?
+            answer="""### Will Optimization Reduce Visual Quality?
 
-- **Lossless Mode**: Zero pixel or structural loss. Preserves exact mathematical data. Recommended for legal records, medical scans, or master artwork.
-- **Balanced Mode (Recommended)**: Uses psychoacoustic and perceptual visual models (exploiting limitations of human eye contrast sensitivity). Retains **92–96% SSIM** while cutting file size by 50–70%.
-- **Maximum Compression**: Noticeable reduction in high-frequency detail (micro-textures or subtle gradients) in exchange for dramatic 70–85% file size cuts.
+- **Smart Optimize (Default)**: Uses perceptual psychoacoustic and contrast-sensitivity models. Retains **92–96% SSIM** while reducing size by 50–70%.
+- **Lossless Mode**: Zero pixel or structural loss. Preserves exact mathematical data. Recommended for archival records, scans, or master artwork.
+- **Maximum Savings**: Applies higher quantization to high-frequency textures for maximum space savings (70–85%).
 
-Our engine displays an authentic **Quality Check (SSIM / Fidelity score)** after every run so you can inspect the exact fidelity before downloading.""",
+MINIFY measures objective **Structural Similarity (SSIM)** on images so you can inspect verified fidelity before downloading.""",
             provider="Local Knowledge Engine",
             suggested_actions=[
-                "Choose Lossless for documents",
-                "Choose Balanced for web photos",
+                "Choose Smart Optimize",
+                "Choose Lossless for archival",
                 "Inspect SSIM score after run"
             ]
         )
 
     # General fallback
     return AIAssistantResponse(
-        answer=f"""### AI Compression Assistant
+        answer="""### MINIFY Assistant
 
-I can help guide you on the best compression strategy for your files!
+I can help guide you on the best optimization strategy for your files:
 
-- **Target Size**: Enter an exact target (e.g. 5 MB) to let the engine automatically calculate optimal quantization and downscaling.
-- **Format Modernization**: Converting PNGs and JPGs to WebP typically saves 30–60% with imperceptible difference.
-- **Transparency**: RGBA channels are strictly preserved for transparent PNGs and WebP images.
-- **Fidelity Guarantee**: We calculate structural similarity (SSIM) on images and provide measured quality metrics so you always know your file's retention rate.
+- **Smart Optimize**: Automatically analyzes file characteristics and selects the ideal quantization and container settings.
+- **Target Size**: Enter an exact target (e.g. 5 MB) to let MINIFY automatically calibrate bitrate and downscaling.
+- **Transparency Preservation**: Alpha channels are strictly preserved for transparent PNGs and WebP graphics.
+- **Quality Verification**: Objective structural similarity (SSIM) is computed for images to guarantee visual retention.
 
-Ask me about formats, quality presets, or specific file targets!""",
+Ask me about formats, optimization presets, or file limits!""",
         provider="Local Knowledge Engine",
         suggested_actions=[
             "Why did my file only compress by 20%?",

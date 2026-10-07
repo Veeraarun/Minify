@@ -12,6 +12,12 @@ export async function checkHealth() {
   return res.json();
 }
 
+export async function checkReady() {
+  const res = await fetch(getApiUrl('/api/ready'));
+  if (!res.ok) throw new Error('Backend readiness check failed');
+  return res.json();
+}
+
 export async function analyzeFile(file) {
   const formData = new FormData();
   formData.append('file', file);

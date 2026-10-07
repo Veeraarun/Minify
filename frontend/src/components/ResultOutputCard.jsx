@@ -1,10 +1,9 @@
-import React from 'react';
 import { 
   Download, 
   Archive, 
   RotateCcw, 
-  CheckCircle2, 
-  Check
+  Check, 
+  ShieldCheck
 } from 'lucide-react';
 import { getApiUrl } from '../services/api';
 
@@ -31,38 +30,38 @@ export default function ResultOutputCard({
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4">
-      <div className="bg-white border border-slate-200 rounded-lg p-5 sm:p-6 shadow-sm">
-        {/* Header */}
-        <div className="text-center pb-4 border-b border-slate-100">
-          <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto mb-2">
-            <Check className="w-5 h-5 stroke-[2.5]" />
+      <div className="bg-dark-900 border border-dark-700 rounded-xl p-5 sm:p-7 shadow-xl">
+        {/* Header Receipt Card */}
+        <div className="text-center pb-5 border-b border-dark-800">
+          <div className="w-12 h-12 rounded-2xl bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/30 flex items-center justify-center mx-auto mb-3 shadow-lg">
+            <Check className="w-6 h-6 stroke-[2.5]" />
           </div>
-          <h2 className="text-base font-semibold text-slate-900">
-            Compression Complete
+          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+            Optimization Complete
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Successfully processed {results.length} {results.length === 1 ? 'file' : 'files'}
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Successfully optimized {results.length} {results.length === 1 ? 'file' : 'files'} while preserving fidelity.
           </p>
 
-          {/* Aggregate callout if batch */}
-          {isBatch && (
-            <div className="inline-flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded px-3 py-1 mt-3 text-xs font-mono">
-              <span className="text-slate-600">Total Saved: <strong className="text-emerald-700">{formatSize(totalSaved)}</strong></span>
-              <span className="text-slate-300">|</span>
-              <span className="text-slate-600">Net Reduction: <strong className="text-emerald-700">{totalPercent}%</strong></span>
-            </div>
-          )}
+          {/* Aggregate callout */}
+          <div className="inline-flex items-center space-x-3 bg-dark-850 border border-dark-750 rounded-lg px-4 py-2 mt-4 text-xs font-mono">
+            <span className="text-slate-400">Total Saved: <strong className="text-accent-emerald font-bold">{formatSize(totalSaved)}</strong></span>
+            <span className="text-dark-600">|</span>
+            <span className="text-slate-400">Net Reduction: <strong className="text-accent-emerald font-bold">{totalPercent}%</strong></span>
+          </div>
         </div>
 
         {/* Global Download Action if batch */}
         {isBatch && batchZipUrl && (
-          <div className="my-4 p-3.5 rounded-md bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center space-x-2.5">
-              <Archive className="w-5 h-5 text-slate-600" />
+          <div className="my-5 p-4 rounded-xl bg-dark-850 border border-primary-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center space-x-3">
+              <div className="p-2.5 rounded-lg bg-dark-800 border border-dark-700">
+                <Archive className="w-5 h-5 text-primary-400" />
+              </div>
               <div>
-                <h4 className="text-xs font-semibold text-slate-900">Download All Files (.zip)</h4>
-                <p className="text-[11px] text-slate-500 font-mono">
-                  Archive of {results.length} files ({formatSize(totalComp)})
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Download All as ZIP Archive</h4>
+                <p className="text-[11px] text-slate-400 font-mono">
+                  Contains all {results.length} optimized files ({formatSize(totalComp)})
                 </p>
               </div>
             </div>
@@ -70,16 +69,16 @@ export default function ResultOutputCard({
             <a
               href={getApiUrl(batchZipUrl)}
               download
-              className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-md shadow-sm transition-colors shrink-0"
+              className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-sm transition-all shrink-0"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download ZIP</span>
+              <span>Download ZIP Archive</span>
             </a>
           </div>
         )}
 
-        {/* Result Items */}
-        <div className="divide-y divide-slate-100 my-4">
+        {/* Result Items List */}
+        <div className="divide-y divide-dark-800 my-4">
           {results.map((res) => {
             const downloadLink = getApiUrl(res.download_url);
 
@@ -90,19 +89,21 @@ export default function ResultOutputCard({
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-xs text-slate-900 truncate">
+                    <span className="font-semibold text-xs text-white truncate max-w-sm">
                       {res.compressed_filename}
                     </span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
+                    <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/40 font-mono">
                       -{res.quality.reduction_percentage}%
                     </span>
                   </div>
 
-                  <div className="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                    <span>{res.quality.original_formatted} → <strong className="text-slate-800">{res.quality.compressed_formatted}</strong></span>
-                    <span>•</span>
-                    <span>Fidelity: {res.quality.quality_score}%</span>
-                    <span>•</span>
+                  <div className="text-xs text-slate-400 font-mono flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <span>
+                      <span className="line-through text-slate-500">{res.quality.original_formatted}</span> → <strong className="text-slate-200">{res.quality.compressed_formatted}</strong>
+                    </span>
+                    <span className="text-dark-600">•</span>
+                    <span>Fidelity: <strong className="text-white">{res.quality.quality_score}%</strong></span>
+                    <span className="text-dark-600">•</span>
                     <span className="text-slate-400 truncate max-w-[200px]">{res.compression_method}</span>
                   </div>
                 </div>
@@ -111,7 +112,7 @@ export default function ResultOutputCard({
                   <a
                     href={downloadLink}
                     download={res.compressed_filename}
-                    className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-md shadow-sm transition-colors"
+                    className="inline-flex items-center space-x-1.5 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download</span>
@@ -122,15 +123,21 @@ export default function ResultOutputCard({
           })}
         </div>
 
+        {/* Ephemeral Privacy Notice */}
+        <div className="my-4 p-3 rounded-lg bg-dark-850 border border-dark-800 flex items-center space-x-2 text-xs text-slate-400">
+          <ShieldCheck className="w-4 h-4 text-accent-emerald shrink-0" />
+          <span>Files are stored temporarily on ephemeral storage and automatically pruned. Please download your files now.</span>
+        </div>
+
         {/* Bottom Actions */}
-        <div className="pt-4 border-t border-slate-100 flex justify-center">
+        <div className="pt-4 border-t border-dark-800 flex justify-center">
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center space-x-1.5 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium px-4 py-2 rounded-md shadow-sm transition-colors"
+            className="inline-flex items-center space-x-2 border border-dark-700 hover:border-dark-600 bg-dark-800 hover:bg-dark-750 text-slate-200 text-xs font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Compress another file</span>
+            <span>Optimize another file</span>
           </button>
         </div>
       </div>

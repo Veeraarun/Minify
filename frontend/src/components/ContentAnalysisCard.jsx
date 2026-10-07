@@ -1,11 +1,10 @@
-import React from 'react';
 import { 
   Sparkles, 
   Cpu, 
   AlertTriangle, 
   ArrowRight, 
-  CheckCircle2,
-  Info
+  Info,
+  Sliders
 } from 'lucide-react';
 
 export default function ContentAnalysisCard({ 
@@ -27,77 +26,105 @@ export default function ContentAnalysisCard({
   const getCompressibilityBadge = (c) => {
     switch (c?.toLowerCase()) {
       case 'very high': 
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-accent-emerald/20 text-accent-emerald border-accent-emerald/40';
       case 'high': 
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-accent-emerald/20 text-accent-emerald border-accent-emerald/40';
       case 'moderate': 
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-primary-500/20 text-primary-300 border-primary-500/40';
       case 'low': 
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-accent-amber/20 text-accent-amber border-accent-amber/40';
       default: 
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-dark-800 text-slate-400 border-dark-700';
     }
+  };
+
+  // Human-friendly "Why MINIFY chose this" explanation
+  const getWhyExplanation = () => {
+    if (rec.why_explanation) return rec.why_explanation;
+    if (file.category === 'image') {
+      if (content.has_transparency) {
+        return "Detected an alpha transparency channel. MINIFY maintains lossless alpha preservation while optimizing RGB color quantization with WebP.";
+      }
+      return "Photographic elements detected with continuous color tones. Discrete cosine & predictive transform encoding will yield maximum space savings without visible loss.";
+    }
+    if (file.category === 'pdf') {
+      return `Document contains ${content.pages || 1} page(s). MINIFY applies PDF stream Deflate compression, font subset pruning, and re-compresses embedded raster objects.`;
+    }
+    if (file.category === 'video') {
+      return "Video stream re-encoding with H.264 CRF rate control and AAC audio quantization removes unnecessary bitrate overhead while preserving temporal sharpness.";
+    }
+    if (file.category === 'audio') {
+      return "Perceptual psychoacoustic model strips frequencies inaudible to the human ear while retaining full stereo image clarity.";
+    }
+    return "Optimized codec quantization will eliminate redundant bit streams while protecting perceptual fidelity.";
   };
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4">
       {/* File selector tabs if multiple files */}
       {analyzedFiles.length > 1 && (
-        <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 overflow-x-auto">
+        <div className="flex items-center space-x-1.5 bg-dark-900 p-1.5 rounded-xl border border-dark-700 overflow-x-auto">
           {analyzedFiles.map((item, idx) => (
             <button
               key={item.file.id}
               onClick={() => onSelectIndex(idx)}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center space-x-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center space-x-2 ${
                 idx === selectedIndex
-                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-dark-800 text-white shadow-sm border border-dark-600'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <span className="truncate max-w-[160px]">{item.file.filename}</span>
-              <span className="text-[11px] text-slate-400 font-mono">({item.file.formatted_size})</span>
+              <span className="text-[11px] text-slate-500 font-mono">({item.file.formatted_size})</span>
             </button>
           ))}
         </div>
       )}
 
       {/* Main Analysis Card */}
-      <div className="bg-white border border-slate-200 rounded-lg p-5 sm:p-6 shadow-sm">
+      <div className="bg-dark-900 border border-dark-700 rounded-xl p-5 sm:p-6 shadow-xl">
         {/* Card Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-dark-800 gap-2">
           <div>
-            <h2 className="text-base font-semibold text-slate-900 truncate">
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-primary-400">File Analysis</span>
+              <span className="text-dark-600">•</span>
+              <span className="text-xs text-slate-400 uppercase font-mono">{file.extension.replace('.', '')} format</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-white truncate">
               {file.filename}
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              File diagnostics & metadata analysis
-            </p>
           </div>
 
           {/* Analyzer Source Badge */}
           <div className="self-start sm:self-auto">
-            <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium">
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-dark-800 border border-dark-700 text-slate-300 text-xs font-medium shadow-inner">
               {isGemini ? (
-                <Sparkles className="w-3 h-3 text-blue-600" />
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-primary-400" />
+                  <span className="text-primary-300 font-semibold">Gemini AI</span>
+                </>
               ) : (
-                <Cpu className="w-3 h-3 text-slate-600" />
+                <>
+                  <Cpu className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-slate-300">Local analysis</span>
+                </>
               )}
-              <span>{source}</span>
             </span>
           </div>
         </div>
 
         {/* Technical Specs Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
-          <div className="p-3 bg-slate-50 rounded-md border border-slate-100">
-            <span className="text-[11px] text-slate-500 block">Original Size</span>
-            <span className="text-sm font-semibold text-slate-900 font-mono mt-0.5 block">{file.formatted_size}</span>
-            <span className="text-[11px] text-slate-400 capitalize">{file.category}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
+          <div className="p-3.5 bg-dark-850 rounded-xl border border-dark-750">
+            <span className="text-[11px] text-slate-400 block font-medium">Original Size</span>
+            <span className="text-sm font-semibold text-white font-mono mt-1 block">{file.formatted_size}</span>
+            <span className="text-[11px] text-slate-500 capitalize">{file.category}</span>
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-md border border-slate-100">
-            <span className="text-[11px] text-slate-500 block">Dimensions / Length</span>
-            <span className="text-sm font-semibold text-slate-900 font-mono mt-0.5 block truncate">
+          <div className="p-3.5 bg-dark-850 rounded-xl border border-dark-750">
+            <span className="text-[11px] text-slate-400 block font-medium">Dimensions / Length</span>
+            <span className="text-sm font-semibold text-white font-mono mt-1 block truncate">
               {content.width && content.height
                 ? `${content.width} × ${content.height}`
                 : content.pages
@@ -106,57 +133,71 @@ export default function ContentAnalysisCard({
                 ? `${content.duration.toFixed(1)}s`
                 : 'Standard Stream'}
             </span>
-            <span className="text-[11px] text-slate-400 truncate block">
+            <span className="text-[11px] text-slate-500 truncate block">
               {content.fps ? `${content.fps} FPS` : content.has_transparency ? 'Alpha channel' : 'Primary track'}
             </span>
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-md border border-slate-100">
-            <span className="text-[11px] text-slate-500 block">Content Category</span>
-            <span className="text-sm font-semibold text-slate-800 mt-0.5 block truncate" title={content.content_category}>
+          <div className="p-3.5 bg-dark-850 rounded-xl border border-dark-750">
+            <span className="text-[11px] text-slate-400 block font-medium">Content Category</span>
+            <span className="text-sm font-semibold text-slate-200 mt-1 block truncate" title={content.content_category}>
               {content.content_category}
             </span>
-            <span className="text-[11px] text-slate-400 truncate block">
+            <span className="text-[11px] text-slate-500 truncate block">
               {content.video_codec || content.audio_codec || file.extension.toUpperCase()}
             </span>
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-md border border-slate-100">
-            <span className="text-[11px] text-slate-500 block">Compressibility</span>
-            <div className="mt-1">
-              <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium border ${getCompressibilityBadge(content.compressibility)}`}>
+          <div className="p-3.5 bg-dark-850 rounded-xl border border-dark-750">
+            <span className="text-[11px] text-slate-400 block font-medium">Compressibility</span>
+            <div className="mt-1.5">
+              <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getCompressibilityBadge(content.compressibility)}`}>
                 {content.compressibility}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Recommendation Panel */}
-        <div className="bg-slate-50 border border-slate-200 rounded-md p-4 mb-4">
-          <div className="flex items-center justify-between mb-1.5">
-            <h4 className="text-xs font-semibold text-slate-800">
-              Recommended Optimization
-            </h4>
-            <span className="text-xs font-mono text-emerald-700 font-medium">
-              Est. reduction: ~{rec.expected_reduction_percent}%
+        {/* Recommended Optimization Card */}
+        <div className="bg-dark-850 border border-dark-700 rounded-xl p-4 sm:p-5 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <Sliders className="w-4 h-4 text-primary-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                Recommended Strategy
+              </h4>
+            </div>
+            <span className="text-xs font-mono text-accent-emerald font-semibold px-2 py-0.5 rounded bg-accent-emerald/10 border border-accent-emerald/30">
+              Est. savings ~{rec.expected_reduction_percent}%
             </span>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed mb-3">
+          <p className="text-xs text-slate-300 leading-relaxed mb-4">
             {rec.compression_strategy}
           </p>
 
-          <div className="pt-2.5 border-t border-slate-200 flex flex-wrap items-center gap-4 text-xs font-mono">
+          {/* "Why MINIFY chose this" rationale */}
+          <div className="p-3 rounded-lg bg-dark-900 border border-dark-800 text-xs mb-4">
+            <div className="flex items-center space-x-1.5 text-primary-400 font-semibold mb-1">
+              <Info className="w-3.5 h-3.5" />
+              <span>Why MINIFY chose this</span>
+            </div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              {getWhyExplanation()}
+            </p>
+          </div>
+
+          <div className="pt-3 border-t border-dark-800 flex flex-wrap items-center gap-4 text-xs font-mono">
             <div>
-              <span className="text-slate-500">Target format: </span>
-              <span className="text-slate-800 font-semibold uppercase">{rec.recommended_output_format}</span>
+              <span className="text-slate-500">Output container: </span>
+              <span className="text-white font-semibold uppercase">{rec.recommended_output_format}</span>
             </div>
             <div>
               <span className="text-slate-500">Projected size: </span>
-              <span className="text-emerald-700 font-semibold">{rec.expected_output_size_formatted}</span>
+              <span className="text-accent-emerald font-semibold">{rec.expected_output_size_formatted}</span>
             </div>
             <div>
-              <span className="text-slate-500">Quality retention: </span>
-              <span className="text-slate-800 font-semibold">~{rec.expected_quality_retention}%</span>
+              <span className="text-slate-500">Fidelity retention: </span>
+              <span className="text-slate-200 font-semibold">~{rec.expected_quality_retention}%</span>
             </div>
           </div>
         </div>
@@ -165,8 +206,8 @@ export default function ContentAnalysisCard({
         {rec.warnings && rec.warnings.length > 0 && (
           <div className="space-y-2 mb-4">
             {rec.warnings.map((warn, i) => (
-              <div key={i} className="flex items-start space-x-2 p-2.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-600 mt-0.5" />
+              <div key={i} className="flex items-start space-x-2.5 p-3 rounded-lg bg-accent-amber/10 border border-accent-amber/30 text-amber-200 text-xs">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-accent-amber mt-0.5" />
                 <span>{warn}</span>
               </div>
             ))}
@@ -174,13 +215,13 @@ export default function ContentAnalysisCard({
         )}
 
         {/* Action Button */}
-        <div className="pt-4 border-t border-slate-100 flex justify-end">
+        <div className="pt-4 border-t border-dark-800 flex justify-end">
           <button
             type="button"
             onClick={onProceedToEngine}
-            className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-2 rounded-md shadow-sm transition-colors"
+            className="inline-flex items-center space-x-2 bg-primary-600 hover:bg-primary-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-all"
           >
-            <span>Configure Compression</span>
+            <span>Proceed to Compression Engine</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

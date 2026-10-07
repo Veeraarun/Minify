@@ -11,7 +11,7 @@ const STEPS = [
 
 export default function WorkflowStepper({ currentStep, onStepClick }) {
   return (
-    <div className="w-full bg-white border-b border-slate-200 py-3 px-4 mb-6">
+    <div className="w-full bg-dark-900/80 border-b border-dark-700 py-3.5 px-4 mb-6">
       <div className="max-w-4xl mx-auto">
         <nav aria-label="Progress">
           <ol className="flex items-center justify-between">
@@ -27,7 +27,7 @@ export default function WorkflowStepper({ currentStep, onStepClick }) {
                     onClick={() => {
                       if (isCompleted && onStepClick) onStepClick(step.id);
                     }}
-                    className={`flex items-center space-x-2 text-left transition-colors ${
+                    className={`flex items-center space-x-2.5 text-left transition-colors ${
                       isCompleted ? 'cursor-pointer group' : 'cursor-default'
                     }`}
                   >
@@ -35,10 +35,10 @@ export default function WorkflowStepper({ currentStep, onStepClick }) {
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors ${
                         isCompleted
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-300 group-hover:bg-emerald-100'
+                          ? 'bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/40 group-hover:bg-accent-emerald/30'
                           : isCurrent
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 text-slate-400 border border-slate-200'
+                          ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30'
+                          : 'bg-dark-800 text-slate-500 border border-dark-700'
                       }`}
                     >
                       {isCompleted ? <Check className="w-3.5 h-3.5 stroke-[2.5]" /> : step.id}
@@ -46,12 +46,12 @@ export default function WorkflowStepper({ currentStep, onStepClick }) {
 
                     {/* Step label */}
                     <span
-                      className={`text-xs font-medium whitespace-nowrap hidden sm:inline ${
+                      className={`text-xs font-medium whitespace-nowrap hidden sm:inline transition-colors ${
                         isCurrent
-                          ? 'text-blue-600 font-semibold'
+                          ? 'text-white font-semibold'
                           : isCompleted
-                          ? 'text-slate-700 group-hover:text-slate-900'
-                          : 'text-slate-400'
+                          ? 'text-slate-300 group-hover:text-white'
+                          : 'text-slate-500'
                       }`}
                     >
                       {step.name}
@@ -62,7 +62,7 @@ export default function WorkflowStepper({ currentStep, onStepClick }) {
                   {stepIdx < STEPS.length - 1 && (
                     <div
                       className={`hidden md:block flex-1 h-px mx-3 ${
-                        isCompleted ? 'bg-emerald-300' : 'bg-slate-200'
+                        isCompleted ? 'bg-accent-emerald/40' : 'bg-dark-700'
                       }`}
                     />
                   )}

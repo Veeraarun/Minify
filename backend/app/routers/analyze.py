@@ -8,7 +8,7 @@ import pymupdf
 import logging
 
 from app.config import UPLOAD_DIR, PREVIEWS_DIR, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB
-from app.utils.file_utils import sanitize_filename, get_file_category, format_bytes, get_mime_type
+from app.utils.file_utils import sanitize_filename, get_file_category, format_bytes, get_mime_type, validate_magic_bytes
 from app.models.schemas import FileAnalysisResponse, FileMetadata, ContentDetails, AnalysisRecommendation
 from app.services.analyzer import analyze_file
 from app.services.cleanup import cleanup_expired_files
@@ -42,7 +42,7 @@ async def analyze_uploaded_file(file: UploadFile = File(...)):
         ext = Path(clean_name).suffix.lower()
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file format '{ext}'. Supported types include JPG, PNG, WebP, MP4, MOV, MKV, MP3, WAV, M4A, and PDF."
+            detail=f"Unsupported file format ({ext}). Supported formats: JPG, PNG, WEBP, PDF, MP4, MP3, WAV, and more."
         )
 
     file_id = uuid.uuid4().hex[:12]
@@ -72,6 +72,12 @@ async def analyze_uploaded_file(file: UploadFile = File(...)):
     if total_bytes == 0:
         target_upload_path.unlink(missing_ok=True)
         raise HTTPException(status_code=400, detail="Uploaded file is empty (0 bytes).")
+
+    # Validate file signature / magic bytes
+    valid_sig, sig_err = validate_magic_bytes(str(target_upload_path), category)
+    if not valid_sig:
+        target_upload_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=400, detail=sig_err or "Corrupted or invalid file format.")
 
     # Generate preview if applicable
     preview_url = None

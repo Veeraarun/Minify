@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
 import { 
   X, 
   Send, 
   Loader2, 
-  HelpCircle, 
   Bot, 
-  User
+  User,
+  Sparkles
 } from 'lucide-react';
 import { askAssistant } from '../services/api';
 
 const QUICK_PROMPTS = [
-  "Why did my file only compress by 20%?",
-  "Which format should I use?",
-  "Can I compress this below 5 MB?",
-  "Will compression reduce quality?"
+  "Which format should I choose?",
+  "Why did my file only compress by 25%?",
+  "How does MINIFY ensure visual fidelity?",
+  "Can I compress this below 2 MB?"
 ];
 
 export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      provider: 'Assistant',
-      text: "Hello! I can help you select the best container format (WebP, MP4, MP3), choose compression presets, or explain fidelity metrics like SSIM."
+      provider: 'MINIFY Assistant',
+      text: "Hello! I am the MINIFY Assistant. I can help guide your compression strategy, explain codec advantages (WebP vs AVIF, H.264 vs H.265), or unpack fidelity metrics like SSIM."
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -43,18 +42,18 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
         ...prev,
         {
           sender: 'bot',
-          provider: response.provider || 'Engine',
+          provider: response.provider || 'MINIFY Engine',
           text: response.answer,
           suggestedActions: response.suggested_actions || []
         }
       ]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
           sender: 'bot',
           provider: 'Local Engine',
-          text: "A connection error occurred. Please try again or select one of the suggested prompts below."
+          text: "A connection issue occurred. Please check backend connectivity or try one of the preset prompts."
         }
       ]);
     } finally {
@@ -67,36 +66,41 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
       {/* Backdrop */}
       <div 
         onClick={onClose}
-        className="fixed inset-0 bg-slate-900/30 transition-opacity"
+        className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm transition-opacity"
       />
 
       {/* Drawer content */}
-      <div className="relative w-full max-w-md bg-white border-l border-slate-200 shadow-xl h-full flex flex-col z-10">
+      <div className="relative w-full max-w-md bg-dark-900 border-l border-dark-700 shadow-2xl h-full flex flex-col z-10">
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-          <div>
-            <h3 className="font-semibold text-slate-900 text-sm">Compression Assistant</h3>
-            <p className="text-[11px] text-slate-500">Codec & optimization guidance</p>
+        <div className="p-4 border-b border-dark-800 flex items-center justify-between bg-dark-850">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary-600/20 text-primary-400 border border-primary-500/30 flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-sm">MINIFY Assistant</h3>
+              <p className="text-[11px] text-slate-400">Intelligent optimization advisor</p>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Quick prompt chips */}
-        <div className="p-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-1.5 overflow-x-auto text-xs">
+        <div className="p-2.5 bg-dark-850/60 border-b border-dark-800 flex items-center gap-1.5 overflow-x-auto text-xs">
           {QUICK_PROMPTS.map((prompt, i) => (
             <button
               key={i}
               type="button"
               onClick={() => handleSend(prompt)}
               disabled={isLoading}
-              className="px-2.5 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 whitespace-nowrap transition-colors text-[11px] font-medium"
+              className="px-2.5 py-1 rounded-md bg-dark-800 hover:bg-dark-750 text-slate-300 border border-dark-700 whitespace-nowrap transition-colors text-[11px] font-medium"
             >
               {prompt}
             </button>
@@ -104,30 +108,32 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
         </div>
 
         {/* Message Log */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => {
             const isBot = msg.sender === 'bot';
 
             return (
               <div
                 key={index}
-                className={`flex items-start space-x-2 ${isBot ? '' : 'flex-row-reverse space-x-reverse'}`}
+                className={`flex items-start space-x-2.5 ${isBot ? '' : 'flex-row-reverse space-x-reverse'}`}
               >
                 <div
-                  className={`w-6 h-6 rounded flex items-center justify-center text-xs shrink-0 ${
-                    isBot ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-blue-600 text-white'
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 ${
+                    isBot 
+                      ? 'bg-dark-800 text-primary-400 border border-dark-700' 
+                      : 'bg-primary-600 text-white'
                   }`}
                 >
-                  {isBot ? <Bot className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                  {isBot ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
                 </div>
 
-                <div className={`max-w-[85%] rounded-md p-3 text-xs leading-relaxed ${
+                <div className={`max-w-[85%] rounded-xl p-3.5 text-xs leading-relaxed ${
                   isBot
-                    ? 'bg-slate-50 border border-slate-200 text-slate-800'
-                    : 'bg-blue-600 text-white'
+                    ? 'bg-dark-850 border border-dark-750 text-slate-200'
+                    : 'bg-primary-600 text-white shadow-sm'
                 }`}>
                   {isBot && (
-                    <div className="text-[10px] text-slate-400 font-mono mb-1 pb-1 border-b border-slate-200">
+                    <div className="text-[10px] text-slate-400 font-mono mb-1.5 pb-1 border-b border-dark-750 flex items-center justify-between">
                       <span>{msg.provider}</span>
                     </div>
                   )}
@@ -138,15 +144,15 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
 
                   {/* Suggested action chips */}
                   {msg.suggestedActions && msg.suggestedActions.length > 0 && (
-                    <div className="mt-2.5 pt-2 border-t border-slate-200 flex flex-wrap gap-1">
-                      {msg.suggestedActions.map((act, idx) => (
+                    <div className="mt-2.5 pt-2 border-t border-dark-750 flex flex-wrap gap-1">
+                      {msg.suggestedActions.map((action, aIdx) => (
                         <button
-                          key={idx}
+                          key={aIdx}
                           type="button"
-                          onClick={() => handleSend(act)}
-                          className="px-2 py-0.5 rounded bg-white text-blue-700 border border-blue-200 text-[10px] hover:bg-blue-50 transition-colors font-medium"
+                          onClick={() => handleSend(action)}
+                          className="px-2 py-0.5 rounded bg-dark-900 border border-dark-700 text-primary-400 hover:text-primary-300 text-[10px] font-mono transition-colors"
                         >
-                          {act}
+                          {action}
                         </button>
                       ))}
                     </div>
@@ -157,15 +163,15 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
           })}
 
           {isLoading && (
-            <div className="flex items-center space-x-1.5 text-xs text-slate-500 p-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Thinking...</span>
+            <div className="flex items-center space-x-2 text-xs text-slate-400 p-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary-400" />
+              <span>MINIFY is formulating recommendations...</span>
             </div>
           )}
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3 border-t border-slate-200 bg-slate-50">
+        {/* Input box */}
+        <div className="p-3 bg-dark-850 border-t border-dark-800">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -175,19 +181,18 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
           >
             <input
               type="text"
-              placeholder="Ask about codecs, settings, sizes..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Ask about codecs, quality, or formats..."
               disabled={isLoading}
-              className="flex-1 bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600"
+              className="flex-1 bg-dark-900 border border-dark-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary-500"
             />
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium disabled:opacity-50 transition-colors flex items-center space-x-1"
+              className="p-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-lg transition-colors"
             >
-              <span>Send</span>
-              <Send className="w-3 h-3" />
+              <Send className="w-3.5 h-3.5" />
             </button>
           </form>
         </div>

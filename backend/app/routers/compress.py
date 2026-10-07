@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 import logging
 
-from app.config import UPLOAD_DIR, PROCESSED_DIR, PREVIEWS_DIR
+from app.config import UPLOAD_DIR, PROCESSED_DIR, PREVIEWS_DIR, MAX_BATCH_FILES
 from app.utils.file_utils import get_file_category, format_bytes, get_mime_type
 from app.models.schemas import CompressionOptions, CompressionResult, QualityResult, BatchCompressRequest, BatchCompressResponse
 from app.services.image_compressor import compress_image
@@ -29,6 +29,23 @@ def find_file_by_id(directory: Path, file_id: str) -> Optional[Path]:
             return p
     return None
 
+def normalize_preset(preset: str) -> str:
+    """Maps product-level presets (smart_optimize, web, email, social) to engine presets."""
+    preset_lower = (preset or "balanced").lower()
+    mapping = {
+        "smart_optimize": "balanced",
+        "web": "balanced",
+        "email": "max_compression",
+        "social": "balanced",
+        "max_savings": "max_compression",
+        "maximum_savings": "max_compression",
+        "max_compression": "max_compression",
+        "balanced": "balanced",
+        "high_quality": "high_quality",
+        "lossless": "lossless"
+    }
+    return mapping.get(preset_lower, "balanced")
+
 @router.post("/compress", response_model=CompressionResult)
 async def compress_single_file(options: CompressionOptions):
     cleanup_expired_files()
@@ -41,14 +58,16 @@ async def compress_single_file(options: CompressionOptions):
     raw_filename = input_path.name[len(options.file_id) + 1:]
     category = get_file_category(raw_filename)
     if not category:
-        raise HTTPException(status_code=400, detail="Unsupported file format.")
+        raise HTTPException(status_code=400, detail="This file type isn't supported.")
 
     original_size = input_path.stat().st_size
     target_size_bytes = int(options.target_size_mb * 1024 * 1024) if options.target_size_mb and options.target_size_mb > 0 else None
 
     # Base output filename
     stem = Path(raw_filename).stem
-    temp_output_path = PROCESSED_DIR / f"{options.file_id}_compressed_{stem}"
+    temp_output_path = PROCESSED_DIR / f"{options.file_id}_optimized_{stem}"
+
+    engine_preset = normalize_preset(options.quality_preset)
 
     try:
         # Dispatch to media compressors
@@ -57,7 +76,7 @@ async def compress_single_file(options: CompressionOptions):
                 input_path=str(input_path),
                 output_path=str(temp_output_path),
                 target_size_bytes=target_size_bytes,
-                quality_preset=options.quality_preset,
+                quality_preset=engine_preset,
                 custom_quality=options.custom_quality,
                 output_format=options.output_format,
                 resize_percentage=options.resize_percentage,
@@ -68,14 +87,14 @@ async def compress_single_file(options: CompressionOptions):
                 input_path=str(input_path),
                 output_path=str(temp_output_path),
                 target_size_bytes=target_size_bytes,
-                quality_preset=options.quality_preset
+                quality_preset=engine_preset
             )
         elif category == "video":
             res = compress_video(
                 input_path=str(input_path),
                 output_path=str(temp_output_path),
                 target_size_bytes=target_size_bytes,
-                quality_preset=options.quality_preset,
+                quality_preset=engine_preset,
                 output_format=options.output_format
             )
         elif category == "audio":
@@ -83,7 +102,7 @@ async def compress_single_file(options: CompressionOptions):
                 input_path=str(input_path),
                 output_path=str(temp_output_path),
                 target_size_bytes=target_size_bytes,
-                quality_preset=options.quality_preset,
+                quality_preset=engine_preset,
                 audio_preset=options.audio_preset
             )
         else:
@@ -91,13 +110,15 @@ async def compress_single_file(options: CompressionOptions):
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
+    except RuntimeError as re:
+        raise HTTPException(status_code=500, detail=str(re))
     except Exception as e:
-        logger.error(f"Compression error: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Compression failed: {str(e)}")
+        logger.error(f"Optimization error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An error occurred during file optimization. Please try again.")
 
     output_path = Path(res["output_path"])
     compressed_size = output_path.stat().st_size
-    compressed_filename = output_path.name[len(options.file_id) + 1:]  # e.g. compressed_photo.webp
+    compressed_filename = output_path.name[len(options.file_id) + 1:]
 
     # Reduction percentage
     diff = original_size - compressed_size
@@ -112,12 +133,12 @@ async def compress_single_file(options: CompressionOptions):
         compressed_size=compressed_size,
         original_specs={},
         output_specs=res.get("output_specs", {}),
-        quality_preset=options.quality_preset
+        quality_preset=engine_preset
     )
 
     # Generate preview thumbnail for compressed PDF if applicable
     if category == "pdf":
-        thumb_name = f"{options.file_id}_compressed_page1.png"
+        thumb_name = f"{options.file_id}_optimized_page1.png"
         thumb_path = PREVIEWS_DIR / thumb_name
         generate_pdf_thumbnail(str(output_path), str(thumb_path))
 
@@ -127,7 +148,7 @@ async def compress_single_file(options: CompressionOptions):
     if res.get("tradeoff_note"):
         warnings.append(res["tradeoff_note"])
     if compressed_size >= original_size:
-        warnings.append("Output size is equal to or slightly larger than original. Preserved best quality.")
+        warnings.append("This file is already highly compressed. Further optimization may increase size or reduce quality.")
 
     quality_result = QualityResult(
         original_size=original_size,
@@ -152,7 +173,7 @@ async def compress_single_file(options: CompressionOptions):
         download_url=f"/api/download/{options.file_id}",
         original_preview_url=f"/api/preview/{options.file_id}/original",
         compressed_preview_url=f"/api/preview/{options.file_id}/compressed",
-        compression_method=res.get("method", "Smart Compression"),
+        compression_method=res.get("method", "MINIFY Smart Optimization"),
         processing_time_ms=duration_ms,
         quality=quality_result,
         warnings=warnings
@@ -161,7 +182,10 @@ async def compress_single_file(options: CompressionOptions):
 @router.post("/batch-compress", response_model=BatchCompressResponse)
 async def batch_compress_files(batch_req: BatchCompressRequest):
     if not batch_req.file_ids:
-        raise HTTPException(status_code=400, detail="No file IDs provided for batch compression.")
+        raise HTTPException(status_code=400, detail="No file IDs provided for batch optimization.")
+
+    if len(batch_req.file_ids) > MAX_BATCH_FILES:
+        raise HTTPException(status_code=400, detail=f"Batch size exceeds maximum limit of {MAX_BATCH_FILES} files.")
 
     results: List[CompressionResult] = []
     total_orig = 0
@@ -185,19 +209,18 @@ async def batch_compress_files(batch_req: BatchCompressRequest):
             if c_path:
                 compressed_paths.append(c_path)
         except Exception as e:
-            logger.warning(f"Batch compression failed for file {fid}: {e}")
+            logger.warning(f"Batch optimization failed for file {fid}: {e}")
 
     if not results:
-        raise HTTPException(status_code=400, detail="Failed to compress any files in batch.")
+        raise HTTPException(status_code=400, detail="Failed to optimize any files in the batch.")
 
     # Create batch ZIP file
     zip_id = uuid.uuid4().hex[:10]
-    zip_filename = f"batch_{zip_id}_ai_compressed.zip"
+    zip_filename = f"batch_{zip_id}_minified.zip"
     zip_path = PROCESSED_DIR / zip_filename
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for p in compressed_paths:
-            # Strip file_id prefix for clean download inside zip
             clean_entry_name = p.name.split('_', 1)[-1]
             zipf.write(p, arcname=clean_entry_name)
 
@@ -215,7 +238,7 @@ async def batch_compress_files(batch_req: BatchCompressRequest):
 async def download_compressed_file(file_id: str):
     file_path = find_file_by_id(PROCESSED_DIR, file_id)
     if not file_path:
-        raise HTTPException(status_code=404, detail="Compressed file not found.")
+        raise HTTPException(status_code=404, detail="Optimized file not found or expired.")
 
     raw_filename = file_path.name[len(file_id) + 1:]
     return FileResponse(
@@ -232,7 +255,7 @@ async def download_all_zip(zip_id: str):
 
     return FileResponse(
         path=str(zip_path),
-        filename=f"ai_compressed_{zip_id}.zip",
+        filename=f"minify_{zip_id}.zip",
         media_type="application/zip"
     )
 
@@ -256,9 +279,10 @@ async def preview_media_file(file_id: str, variant: str):
     ext = file_path.suffix.lower()
 
     if ext == ".pdf":
-        # Look for rendered thumbnail
-        thumb_pattern = f"{file_id}_compressed_page1.png" if variant == "compressed" else f"{file_id}_page1.png"
+        thumb_pattern = f"{file_id}_optimized_page1.png" if variant == "compressed" else f"{file_id}_page1.png"
         thumb_path = PREVIEWS_DIR / thumb_pattern
+        if not thumb_path.exists() and variant == "compressed":
+            thumb_path = PREVIEWS_DIR / f"{file_id}_compressed_page1.png"
         if thumb_path.exists():
             return FileResponse(path=str(thumb_path), media_type="image/png")
 

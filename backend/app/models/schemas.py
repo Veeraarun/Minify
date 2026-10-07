@@ -1,8 +1,21 @@
 from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field
 
+class SubsystemStatus(BaseModel):
+    engine: str = "online"
+    image: str = "ready"
+    pdf: str = "ready"
+    ffmpeg: str = "ready"
+    ai: str = "local"
+
+class ReadyResponse(BaseModel):
+    status: str = "ready"
+    service: str = "MINIFY"
+    subsystems: SubsystemStatus
+
 class HealthResponse(BaseModel):
     status: str
+    service: str = "MINIFY"
     ffmpeg_available: bool
     ffmpeg_version: Optional[str] = None
     pillow_version: str
@@ -57,7 +70,7 @@ class FileAnalysisResponse(BaseModel):
 class CompressionOptions(BaseModel):
     file_id: str
     target_size_mb: Optional[float] = None
-    quality_preset: str = "balanced"  # max_compression, balanced, high_quality, lossless, custom
+    quality_preset: str = "balanced"  # smart_optimize, max_compression, balanced, high_quality, lossless, custom, web, email, social
     custom_quality: Optional[int] = None  # 1 to 100
     output_format: Optional[str] = None  # webp, jpg, png, mp4, mp3, pdf, etc.
     resize_percentage: Optional[int] = None  # 100, 75, 50, etc.

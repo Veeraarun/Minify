@@ -1,42 +1,54 @@
-# AI Compressor
+# MINIFY
+### Intelligent File Optimization
 
-An intelligent, multi-format media optimization and compression platform designed to drastically reduce file sizes while maintaining perceptual fidelity. Powered by automated content diagnostics, structural similarity index (SSIM) verification, adaptive quantization algorithms, and an AI-assisted recommendation layer.
+> *"Compress files intelligently while preserving the quality that matters."*
 
----
-
-## 📌 Problem Statement
-Traditional compression tools either aggressively destroy visual fidelity with fixed quality presets or produce bloated files due to unoptimized container overhead and unquantized raster streams. Users rarely know the optimal combination of CRF, bitrate, chroma subsampling, and container format needed for their specific media file.
-
-**AI Compressor** bridges this gap by automatically diagnosing file structure, recommending optimal encoding profiles, dynamically iterating toward user-specified target file sizes (e.g. *"under 5 MB"*), and verifying objective quality (measured SSIM) before download.
+MINIFY is a modern, high-performance file optimization platform designed to drastically reduce asset footprints across images, video, audio, and PDF documents without sacrificing perceptual fidelity. Powered by automated content diagnostics, iterative binary-search quantization, measured Structural Similarity Index (SSIM) verification, and an intelligent recommendation layer.
 
 ---
 
-## ✨ Features
+## 📌 The Problem MINIFY Solves
+Standard compression utilities either aggressively degrade visual clarity with arbitrary quality sliders or produce bloated files due to unoptimized container overhead and unquantized streams. Content creators and developers often don't know the exact combination of CRF, quantization matrices, chroma subsampling, and container profiles suited for their specific assets.
 
-- **5-Step Directed Workflow Stepper**: `Upload` ➔ `Content Analysis` ➔ `Compression Engine` ➔ `Quality Check` ➔ `Output & Download`.
-- **True Multi-Format Support**:
-  - **Images**: JPG, JPEG, PNG, WEBP, GIF (animated frame-by-frame optimization).
-  - **Videos**: MP4, MOV, MKV, AVI (H.264/AAC with two-pass and CRF support).
-  - **PDF Documents**: Embedded raster downsampling, font subsetting, and object stream deflation while preserving 100% vector text readability.
-  - **Audio Tracks**: MP3, WAV, AAC, M4A with dedicated Speech and Hi-Fi Music psychoacoustic profiles.
-- **Real AI-Assisted Diagnostics**:
-  - Direct integration with Google Gemini 2.5 Flash via `GEMINI_API_KEY`.
-  - Transparent deterministic fallback labeled **"Local AI-assisted analysis"** when no API key is supplied.
-- **Target Size Matching**:
-  - Iteratively executes binary search on quantization parameters and downscale factors until user-defined size limits (e.g. 5 MB) are satisfied.
-  - Enforces safe quality floors to prevent severe pixelation.
-- **Mathematical Quality Verification**:
-  - Computes objective **Structural Similarity Index (SSIM)** on images via block-based luminance variance.
-  - Distinguishes measured mathematical metrics from empirical psychoacoustic/VMAF estimates.
-- **Interactive Previews**:
-  - Side-by-side and A/B toggle visual comparisons for images.
-  - First-page rendered previews for PDFs.
-  - Native HTML5 dual-player comparisons for videos and audio streams.
-- **Batch Processing & ZIP Archival**:
-  - Simultaneous multi-file queuing, analysis, and compression.
-  - Individual asset downloads or one-click **"Download All as ZIP"**.
-- **Interactive AI Compression Assistant**:
-  - Non-blocking slide-over drawer answering queries on codecs, compression limits, and quality tradeoffs.
+**MINIFY** solves this with an intelligent, 5-stage workflow:
+1. **Content Diagnostics**: Inspects raster entropy, magic byte signatures, codec parameters, and alpha channels.
+2. **Strategy Selection**: Recommends the optimal container format and compression profile with clear rationale (*"Why MINIFY chose this"*).
+3. **Adaptive Quantization**: Dynamically tunes matrices or runs binary search to meet exact target size constraints (e.g. *"under 2.5 MB"*).
+4. **Objective Quality Verification**: Quantifies visual fidelity with measured mathematical SSIM before delivery.
+5. **Private Ephemeral Delivery**: Instant downloads with automated background purging.
+
+---
+
+## ✨ Features & Capabilities
+
+- **5-Step Directed Pipeline**:
+  - `01 Upload`: Multi-file drag-and-drop queue with magic-byte validation and live status indicators.
+  - `02 Content Analysis`: Metadata diagnostics, compressibility rating, and explanatory rationale.
+  - `03 Compression Engine`: Preset profiles (*Smart Optimize*, *Web Delivery*, *Email Safe*, *Social & Feed*, *Maximum Savings*, *Custom*), Quality vs Size slider, exact target size threshold, and collapsible advanced settings.
+  - `04 Quality Check`: Measured SSIM scores, bytes saved callouts, and an **interactive before/after comparison slider** (plus side-by-side and A/B toggle modes).
+  - `05 Output & Download`: Itemized download links or one-click **Batch ZIP Archive**.
+
+- **Multi-Format Media Engine**:
+  - **Images**: JPEG, PNG, WebP, GIF (alpha channel preservation, EXIF sanitization, WebP lossy/lossless).
+  - **PDF Documents**: PyMuPDF object stream deflation, font subsetting, and raster downsampling while keeping vector text sharp.
+  - **Videos**: MP4, MKV, MOV, AVI (H.264/AAC with CRF rate control, two-pass target size matching).
+  - **Audio Tracks**: MP3, WAV, AAC, M4A with dedicated Voice/Speech and Hi-Fi Music psychoacoustic profiles.
+
+- **Objective Quality Verification**:
+  - Computes mathematical **Structural Similarity Index (SSIM)** against the reference master.
+  - Interactive split slider enables real-time visual inspection at 1:1 pixel fidelity.
+  - Dual players for video and audio stream verification; Page 1 rendered previews for PDF documents.
+
+- **Transparent AI Diagnostics**:
+  - Cloud-assisted recommendations via Google Gemini API (`GEMINI_API_KEY`).
+  - Deterministic local rule engine fallback clearly labeled as **"Local analysis"** when no API key is supplied.
+  - Slide-over **MINIFY Assistant** for conversational guidance on codecs, formats, and quality limits.
+
+- **Private by Design & Production Hardened**:
+  - **Magic-Byte Inspection**: Validates binary file headers to block disguised executable payloads.
+  - **HTTP Security Headers**: Enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and strict referrer policies.
+  - **Automated Ephemeral Purging**: Background worker continuously evicts temporary files older than 1 hour.
+  - **Local Optimization History**: Stores recent optimization receipts locally in the user's browser `localStorage` (no server-side tracking).
 
 ---
 
@@ -45,14 +57,14 @@ Traditional compression tools either aggressively destroy visual fidelity with f
 ```
                    ┌────────────────────────────────────────┐
                    │           Frontend (SPA)               │
-                   │    React + Vite + Tailwind CSS         │
-                   │    Lucide Icons, Dark UI Dashboard     │
+                   │    React 19 + Vite 6 + Tailwind CSS    │
+                   │    Lucide Icons, Dark SaaS Interface   │
                    └──────────────────┬─────────────────────┘
                                       │ REST API / JSON
                                       ▼
                    ┌────────────────────────────────────────┐
-                   │           FastAPI Backend              │
-                   │   App Routing, Lifespan & File Guards  │
+                   │             MINIFY Backend             │
+                   │       FastAPI + Security Headers       │
                    └───────┬────────────────────────┬───────┘
                            │                        │
              ┌─────────────┴────────────┐     ┌─────┴──────────────────┐
@@ -76,11 +88,10 @@ Traditional compression tools either aggressively destroy visual fidelity with f
              └──────────────────────────┘
 ```
 
-### Stack Components
-- **Frontend**: React 19, Vite 6, Tailwind CSS 3.4, Lucide React icons.
-- **Backend**: Python 3.10+ / 3.14, FastAPI, Uvicorn, Pydantic v2.
-- **Processing Libraries**: Pillow, PyMuPDF (fitz), NumPy, FFmpeg 9.0 (Gyan build).
-- **AI Integration**: Google Gemini API via REST, deterministic local rule fallback.
+- **Frontend**: React 19, Vite 6, Tailwind CSS 3.4, Lucide React icons, Oxlint.
+- **Backend**: Python 3.10+ (tested on Python 3.14), FastAPI, Uvicorn, Pydantic v2.
+- **Core Processors**: Pillow, PyMuPDF (fitz), NumPy, FFmpeg.
+- **AI Integration**: Google Gemini API via REST with deterministic local rule fallback.
 
 ---
 
@@ -93,24 +104,24 @@ Webenoid/
 │   │   ├── models/
 │   │   │   └── schemas.py             # Pydantic request/response contracts
 │   │   ├── routers/
-│   │   │   ├── health.py              # GET /api/health
-│   │   │   ├── analyze.py             # POST /api/analyze
+│   │   │   ├── health.py              # GET /api/health and GET /api/ready
+│   │   │   ├── analyze.py             # POST /api/analyze (magic byte guard)
 │   │   │   ├── compress.py            # POST /api/compress, /api/batch-compress, downloads
 │   │   │   └── assistant.py           # POST /api/ai-assistant
 │   │   ├── services/
-│   │   │   ├── ai_gemini.py           # Gemini 2.5 Flash cloud client
+│   │   │   ├── ai_gemini.py           # Gemini cloud recommendations
 │   │   │   ├── analyzer.py            # Content diagnostics & local rule engine
 │   │   │   ├── image_compressor.py    # Pillow WebP/JPEG/PNG/GIF engine
 │   │   │   ├── pdf_compressor.py      # PyMuPDF stream deflate & image re-encoder
-│   │   │   ├── video_compressor.py    # FFmpeg H.264/AAC encoder with CRF & target bitrate
+│   │   │   ├── video_compressor.py    # FFmpeg H.264/AAC encoder with CRF & target search
 │   │   │   ├── audio_compressor.py    # FFmpeg MP3/AAC speech/music engine
-│   │   │   ├── quality_checker.py     # NumPy SSIM and perceptual quality models
+│   │   │   ├── quality_checker.py     # NumPy SSIM calculation
 │   │   │   └── cleanup.py             # Auto-eviction of temporary files (>1 hour)
 │   │   ├── utils/
 │   │   │   ├── ffmpeg_utils.py        # FFmpeg & FFprobe binary auto-detection
-│   │   │   └── file_utils.py          # Filename sanitization, categories & byte formatters
-│   │   ├── config.py                  # Env variable loaders and filesystem directories
-│   │   └── main.py                    # FastAPI root application & CORS middleware
+│   │   │   └── file_utils.py          # Magic byte validator, categories & formatters
+│   │   ├── config.py                  # Product settings, limits & paths
+│   │   └── main.py                    # FastAPI root application & security middleware
 │   ├── tests/
 │   │   └── test_api.py                # 10 automated integration and unit test suites
 │   ├── requirements.txt
@@ -118,18 +129,18 @@ Webenoid/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Header.jsx             # System live badges & AI Assistant trigger
-│   │   │   ├── WorkflowStepper.jsx    # 5-step progress indicator
-│   │   │   ├── UploadZone.jsx         # Drag-and-drop zone & batch file queue
-│   │   │   ├── ContentAnalysisCard.jsx# Diagnostics, compressibility & AI recommendations
-│   │   │   ├── CompressionEngineCard.jsx # Presets, target size input, format selection
-│   │   │   ├── QualityCheckCard.jsx   # SSIM score, before/after previews, players
-│   │   │   ├── ResultOutputCard.jsx   # File downloads and batch ZIP archive
+│   │   │   ├── Header.jsx             # MINIFY wordmark, nav, live status, Assistant trigger
+│   │   │   ├── WorkflowStepper.jsx    # 5-stage progress navigation
+│   │   │   ├── UploadZone.jsx         # Drag-and-drop zone, queue pills & privacy pledge
+│   │   │   ├── ContentAnalysisCard.jsx# Diagnostics, "Why MINIFY chose this" rationale
+│   │   │   ├── CompressionEngineCard.jsx # Presets, slider, target size, advanced accordion
+│   │   │   ├── QualityCheckCard.jsx   # SSIM score, interactive before/after split slider
+│   │   │   ├── ResultOutputCard.jsx   # Optimization report receipt & batch ZIP download
 │   │   │   └── AIAssistantDrawer.jsx  # Slide-over chat consultation drawer
 │   │   ├── services/
-│   │   │   └── api.js                 # Fetch client with base URL & proxy support
-│   │   ├── App.jsx                    # Root state coordinator
-│   │   ├── index.css                  # Tailwind styles
+│   │   │   └── api.js                 # API client with health, analyze, compress & assistant
+│   │   ├── App.jsx                    # Root state coordinator with How-it-works, Privacy, History
+│   │   ├── index.css                  # Dark theme stylesheet & custom scrollbars
 │   │   └── main.jsx
 │   ├── package.json
 │   ├── tailwind.config.js
@@ -141,57 +152,58 @@ Webenoid/
 
 ---
 
-## 🚀 Installation & Local Development
+## 🚀 Quickstart & Local Development
 
 ### Prerequisites
 - Python 3.10+ (tested on Python 3.14)
 - Node.js 18+ and npm
-- FFmpeg installed and in PATH (or auto-installed via winget `winget install Gyan.FFmpeg`)
+- FFmpeg in PATH (optional for video/audio, images & PDFs work without FFmpeg)
 
 ### 1. Backend Setup
 ```bash
 cd backend
 
-# Optional: Create and activate virtual environment
+# Create and activate virtual environment (optional)
 python -m venv venv
-venv\Scripts\activate   # On Windows
-# source venv/bin/activate # On Linux/macOS
+venv\Scripts\activate       # On Windows
+# source venv/bin/activate  # On Linux/macOS
 
-# Install backend dependencies
+# Install dependencies
 python -m pip install -r requirements.txt
 
-# Create .env from template (optional, works out of the box with local engine)
+# Create .env file (optional; local analysis works without keys)
 copy .env.example .env
 
-# Run FastAPI server
+# Start FastAPI server
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-The backend API is now running on `http://localhost:8000`. Swagger documentation is available at `http://localhost:8000/docs`.
+The API is available at `http://localhost:8000`. Interactive docs are at `http://localhost:8000/docs`.
 
 ### 2. Frontend Setup
 ```bash
 cd frontend
 
-# Install frontend dependencies
+# Install dependencies
 npm install
 
-# Start Vite development server
+# Start development server
 npm run dev
 ```
-The frontend is now running on `http://localhost:5173`.
+The interface is available at `http://localhost:5173`.
 
 ---
 
-## 🧪 Automated Test Verification
+## 🧪 Verification & Testing
 
-Run the comprehensive pytest suite covering health checks, image analysis, WebP conversion, target-size iteration, PDF deflate, video encoding, audio downmixing, empty/invalid files, and the AI assistant:
+### Automated Backend Test Suite
+Run the 10 automated test suites covering health checks, image analysis, WebP conversion, target-size iteration, PDF compression, security guards, empty uploads, video/audio encoding, batch processing, and the AI assistant:
 
 ```bash
 cd backend
 python -m pytest tests/test_api.py -v
 ```
 
-All 10 test suites run against real synthesized image, audio, video, and PDF buffers:
+Expected output:
 ```
 tests/test_api.py::test_health_endpoint PASSED                           [ 10%]
 tests/test_api.py::test_upload_and_analyze_image PASSED                  [ 20%]
@@ -203,85 +215,63 @@ tests/test_api.py::test_empty_file_upload PASSED                         [ 70%]
 tests/test_api.py::test_video_and_audio_compression PASSED               [ 80%]
 tests/test_api.py::test_batch_compression PASSED                         [ 90%]
 tests/test_api.py::test_ai_assistant PASSED                              [100%]
-============================== 10 passed in 37s ===============================
+============================== 10 passed in 6.33s ==============================
 ```
 
-Verify frontend production build:
+### Frontend Lint & Production Build
 ```bash
 cd frontend
-npm run build
+npm run lint    # Oxlint (0 errors, 0 warnings)
+npm run build   # Vite production build (0 errors)
 ```
-Output: `✓ built in 11.9s` with 0 errors.
 
 ---
 
-## ⚙️ Environment Variables
+## 📡 API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Basic health status, installed FFmpeg status, and Gemini flag |
+| `GET` | `/api/ready` | Structured subsystem readiness (`engine`, `image`, `pdf`, `ffmpeg`, `ai`) |
+| `POST` | `/api/analyze` | Uploads file, verifies magic bytes, analyzes entropy & metadata |
+| `POST` | `/api/compress` | Optimizes file with specified preset or target size, computes SSIM |
+| `POST` | `/api/batch-compress` | Batch optimizes up to 25 files and prepares ZIP archive |
+| `GET` | `/api/download/{file_id}` | Streams optimized individual file |
+| `GET` | `/api/download-all/{zip_id}`| Streams combined batch ZIP archive |
+| `GET` | `/api/preview/{file_id}/{variant}` | Serves preview stream (original or compressed) |
+| `POST` | `/api/ai-assistant` | Context-aware compression guidance chatbot |
+
+---
+
+## ⚙️ Environment Configuration
 
 ### Backend (`backend/.env`)
 | Variable | Default | Description |
 |---|---|---|
-| `GEMINI_API_KEY` | `""` | Optional Google Gemini API key. If absent, transparently falls back to the local deterministic rule engine. |
-| `MAX_FILE_SIZE_MB` | `100` | Maximum upload size limit per file in megabytes. |
+| `GEMINI_API_KEY` | `""` | Optional Google Gemini API key. If unset, MINIFY uses the deterministic local analyzer. |
+| `MAX_FILE_SIZE_MB` | `100` | Maximum upload limit per file in megabytes. |
+| `MAX_BATCH_FILES` | `25` | Maximum number of files in a single batch. |
 | `HOST` | `0.0.0.0` | Server bind host. |
 | `PORT` | `8000` | Server bind port. |
-| `CORS_ORIGINS` | `http://localhost:5173,...` | Comma-separated list of allowed origins. |
-| `FFMPEG_PATH` | `""` | Optional manual override path to FFmpeg executable if not in PATH. |
+| `CORS_ORIGINS` | `http://localhost:5173,...` | Allowed CORS origins. |
+| `FFMPEG_PATH` | `""` | Optional manual path to FFmpeg binary if not in system PATH. |
 
 ### Frontend (`frontend/.env`)
 | Variable | Default | Description |
 |---|---|---|
-| `VITE_API_URL` | `""` | Base API URL. In local dev, leave empty to use Vite's `/api` proxy. In production, set to your deployed backend origin. |
+| `VITE_API_URL` | `""` | Base API URL. In local dev, leave empty to use Vite's `/api` proxy. |
 
 ---
 
-## 📡 API Endpoints
+## 🔒 Security & Privacy Guarantees
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Returns backend health, installed FFmpeg status, and Gemini flag |
-| `POST` | `/api/analyze` | Accepts multipart file, validates format, runs diagnostics, returns metadata |
-| `POST` | `/api/compress` | Compresses asset using specified preset or target size, computes SSIM |
-| `POST` | `/api/batch-compress` | Compresses multiple assets and prepares a ZIP package |
-| `GET` | `/api/download/{file_id}` | Streams individual compressed file with attachment disposition |
-| `GET` | `/api/download-all/{zip_id}`| Streams batch ZIP archive |
-| `GET` | `/api/preview/{file_id}/{variant}` | Serves original or compressed preview (image/PDF page 1/media stream) |
-| `POST` | `/api/ai-assistant` | AI consultation chat endpoint |
+1. **Magic-Byte Filtering**: Every uploaded file is inspected at byte offset 0 to verify authentic headers (e.g. `\xFF\xD8\xFF` for JPEG, `%PDF` for PDF, `RIFF...WEBP`) and reject binary executables (`MZ`, `ELF`).
+2. **Ephemeral Disk Isolation**: Files exist only in isolated temporary workspaces on the server.
+3. **Automated Pruning**: A background thread evicts temporary files older than 1 hour.
+4. **Metadata Stripping**: Users can automatically strip EXIF geolocation, camera metadata, and document author tags.
+5. **No Telemetry**: No document or image contents are logged or stored permanently.
 
 ---
 
-## 🖥️ Demo Workflow
-
-1. **Launch App**: Open `http://localhost:5173`. Observe **Engine Online** and **FFmpeg ✓** badges in the header.
-2. **Upload Asset**: Drag and drop any JPG, PNG, PDF, MP4, or MP3 file into the drop zone.
-3. **Inspect Content Analysis**: The app shifts to Step 2. Inspect the detected compressibility, image dimensions, audio bitrate, and the AI recommended strategy.
-4. **Configure Target Size**: Proceed to Step 3. Select a preset (e.g. *Balanced*) or specify an exact target size (e.g. `1 MB`).
-5. **Execute Compression**: Click *Start Smart Compression*. The backend iteratively optimizes quantization matrices.
-6. **Inspect Quality Check**: The app transitions to Step 4. Inspect the exact percentage reduction, the measured **SSIM fidelity score**, and compare side-by-side or A/B toggles.
-7. **Download**: Proceed to Step 5 and download the optimized file or test batch compression to download a combined ZIP.
-
----
-
-## ☁️ Deployment Instructions
-
-### Backend (Render / Railway / VPS)
-1. Set the build command: `pip install -r backend/requirements.txt`
-2. Install system packages: Ensure `ffmpeg` is available on the system image (e.g. via `apt-get install -y ffmpeg` or Render native packages).
-3. Set start command: `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-4. Configure environment variables (`GEMINI_API_KEY`, `MAX_FILE_SIZE_MB`, `CORS_ORIGINS`).
-
-### Frontend (Vercel / Netlify)
-1. Root directory: `frontend`
-2. Build command: `npm run build`
-3. Output directory: `dist`
-4. Set environment variable: `VITE_API_URL=https://your-backend-domain.com`
-
----
-
-## ⚠️ Limitations & Edge Cases Handled
-
-- **Encrypted / Password-Protected PDFs**: The backend flags encrypted documents with a friendly notification explaining that decryption is required before stream re-encoding.
-- **Already Compressed Media**: The engine detects low byte-per-pixel densities and warns users against aggressive lossy re-encoding to avoid generation loss.
-- **File Inflation Protection**: If re-encoding an already compact file would increase its size, the engine automatically preserves the original file.
-- **FFmpeg Absence**: If FFmpeg is not installed, the application gracefully flags video/audio endpoints with actionable instructions while keeping image and PDF compression 100% operational.
-- **Large Files**: Uploads exceeding `MAX_FILE_SIZE_MB` are rejected with HTTP 413 and cleanly purged from disk.
-- **Privacy & Hygiene**: Stored uploads and processed files are isolated in temporary storage and cleaned up automatically after 1 hour.
+## 📄 License
+MIT License. Built with FastAPI, Pillow, PyMuPDF, FFmpeg, and React.
