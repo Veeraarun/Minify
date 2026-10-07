@@ -87,6 +87,7 @@ export default function AIAssistantDrawer({ isOpen, onClose, currentContext }) {
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close Assistant"
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
           >
             <X className="w-4 h-4" />

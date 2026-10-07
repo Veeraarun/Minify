@@ -237,7 +237,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-4">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Step 1: Upload */}
         {currentStep === 1 && (
           <div className="space-y-6">
@@ -328,7 +328,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsHowItWorksOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800"
+                aria-label="Close How It Works dialog"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -416,7 +417,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsPrivacyOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800"
+                aria-label="Close Privacy dialog"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -471,7 +473,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsHistoryOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800"
+                aria-label="Close History dialog"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -525,15 +528,33 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-dark-800 bg-dark-900/90 py-5 text-xs text-slate-400 mt-auto">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white">MINIFY</span>
+            <span className="font-bold text-white tracking-tight">MINIFY</span>
             <span>•</span>
-            <span>Intelligent file optimization</span>
+            <span className="text-slate-400">Intelligent file optimization</span>
           </div>
-          <p className="font-mono text-slate-500 text-[11px]">
-            FastAPI • Pillow • PyMuPDF • FFmpeg • React
-          </p>
+          <div className="text-slate-400 flex items-center space-x-1.5 text-xs">
+            <span>Built by Veera Arun V</span>
+            <span className="text-slate-600">·</span>
+            <a
+              href="https://github.com/Veeraarun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-200 transition-colors underline-offset-4 hover:underline"
+            >
+              GitHub
+            </a>
+            <span className="text-slate-600">·</span>
+            <a
+              href="https://linkedin.com/in/veeraarun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-200 transition-colors underline-offset-4 hover:underline"
+            >
+              LinkedIn
+            </a>
+          </div>
         </div>
       </footer>
     </div>

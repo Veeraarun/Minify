@@ -12,7 +12,7 @@ const STEPS = [
 export default function WorkflowStepper({ currentStep, onStepClick }) {
   return (
     <div className="w-full bg-dark-900/80 border-b border-dark-700 py-3.5 px-4 mb-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav aria-label="Progress">
           <ol className="flex items-center justify-between">
             {STEPS.map((step, stepIdx) => {
